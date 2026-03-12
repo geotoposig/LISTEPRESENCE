@@ -52,16 +52,8 @@ export default function App() {
   });
   const [submitted, setSubmitted] = useState(false);
 
-  useEffect(() => {
-    // Initialize FingerprintJS
-    const setFp = async () => {
-      const fpPromise = FingerprintJS.load();
-      const fp = await fpPromise;
-      const result = await fp.get();
-      setVisitorId(result.visitorId);
-    };
-    setFp();
-
+  const requestLocation = () => {
+    setLocation(prev => ({ ...prev, loading: true, error: null }));
     if (!navigator.geolocation) {
       setLocation(prev => ({ ...prev, error: "Geolocation is not supported by your browser", loading: false }));
       return;
@@ -84,6 +76,19 @@ export default function App() {
         setLocation(prev => ({ ...prev, error: errorMsg, loading: false }));
       }
     );
+  };
+
+  useEffect(() => {
+    // Initialize FingerprintJS
+    const setFp = async () => {
+      const fpPromise = FingerprintJS.load();
+      const fp = await fpPromise;
+      const result = await fp.get();
+      setVisitorId(result.visitorId);
+    };
+    setFp();
+
+    requestLocation();
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -210,10 +215,28 @@ export default function App() {
           <div className="p-8 md:p-12 space-y-10" dir="rtl">
             {/* Full Name */}
             <div className="space-y-3">
-              <label className="flex items-center gap-2 text-sm font-semibold text-neutral-500 uppercase tracking-wider">
-                <User className="w-4 h-4" />
-                الاسم الكامل
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 text-sm font-semibold text-neutral-500 uppercase tracking-wider">
+                  <User className="w-4 h-4" />
+                  الاسم الكامل
+                </label>
+                <button
+                  type="button"
+                  onClick={requestLocation}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all border ${
+                    location.lat 
+                      ? 'bg-emerald-50 border-emerald-100 text-emerald-600' 
+                      : 'bg-neutral-50 border-neutral-200 text-neutral-500 hover:bg-neutral-100'
+                  }`}
+                >
+                  {location.loading ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <MapPin className="w-3 h-3" />
+                  )}
+                  تحديد موقعي الآن
+                </button>
+              </div>
               <input 
                 type="text"
                 required
