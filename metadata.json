@@ -1,0 +1,5 @@
+{
+  "name": "Moroccan Academic Registration Form",
+  "description": "A registration form for Moroccan university students and professors with automatic location detection.",
+  "requestFramePermissions": ["geolocation"]
+}
